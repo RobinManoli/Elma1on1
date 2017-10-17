@@ -1,0 +1,65 @@
+{{extend 'layout.html'}}
+
+<h1>Eol Battle Riding Quality Statistics</h1>
+<p>
+	Usage (inside eol chat, where X is your given score):<br>
+	<strong>!rec X [optional comment]</strong><br>
+	Note: when a new battle has started, that rec will be voted for.
+</p>
+
+<table>
+	<tr>
+		<th></th>
+		<th class="l">
+			Nick &nbsp; {{=asc_desc('username', default_sort='')}}
+		</th>
+		<th>
+			Total Score &nbsp; {{=asc_desc('total_score', default_column=True)}}
+		</th>
+		<th>
+			Average Score &nbsp; {{=asc_desc('rider_score')}}
+		</th>
+		<th>
+			Total Votes &nbsp; {{=asc_desc('rider_votes')}}
+		</th>
+		<th>Tools</th>
+	</tr>
+	{{for i, row in enumerate(rider_rows):}}
+	<tr>
+		<td>
+			{{=i+1}}
+		</td>
+		<td>
+			{{=row.username}}
+			{{if row.team:}} [{{=row.team}}] {{pass}}
+		</td>
+		<td class="c">
+			{{if row.rider_score and row.rider_votes:}}
+				{{="%.2f" % (float(row.rider_votes)*float(row.rider_score))}}
+			{{pass}}
+		</td>
+		<td class="c">
+			{{if row.rider_score:}}
+				{{="%.2f" % float(row.rider_score)}}
+			{{pass}}
+		</td>
+		<td class="c">{{=row.rider_votes}}</td>
+		<td class="c">
+			<a href="{{=URL('eol_battles','rider_score_history/%s'%row.username)}}">
+				<img class="icon" src="{{=URL('static','images/keyamoon/bars.png')}}" title="History" alt="History">
+			</a> &nbsp; &nbsp;
+			<a href="http://www.elmaonline.net/players/{{=row.username}}" rel="external" target="_blank">
+				<img class="icon" src="{{=URL('static','images/keyamoon/new-tab.png')}}" title="Eol Profile" alt="Eol Profile" style="m">
+			</a>
+		</td>
+	</tr>
+	{{pass}}
+</table>
+
+<p>
+	<em>
+		Stats calculated from {{ =db(db.eol_battle.id == 1).select( limitby=(0,1), cache=(cache.disk,60*60*24*365) ).first().started }}<br>
+		Total votes: ~{{ =db(db.eol_battle_vote.vote_type == '!rec').count( cache=(cache.disk,60*60*24) ) }}<br>
+		Total battles: ~{{ =db(db.eol_battle.id > 0).count( cache=(cache.disk,60*60*24) ) }}<br>
+	</em>
+</p>

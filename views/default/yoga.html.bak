@@ -1,0 +1,6 @@
+{{extend 'layout.html'}}
+<img id="main-page-image" class="center" src="{{=URL('static','images/samadhi.jpg')}}" alt="Samadhi - Absorption" style="border-radius:5px;" />
+<p>»{{=T("Tantra defines Yoga as “Saḿyoga Yoga Ityukto Jiivátmá Paramátmanah”. The unification of Jiivátman with Paramátman is termed Yoga. What is Paramátman and Jiivátman? The moon in the sky is like Paramátman and its reflection in the pond is Jiivátman. How to unify Jiivátman with Paramátman? When the moon in the sky reaches the moon in the pond then there is oneness between the two. The reflection of Paramátman on unit mind is Jiivátman. When the mind reaches Paramátman both Jiivátman and Paramátman become one. This is the explanation of Yoga according to Tantra.")}}«</p>
+</p>
+<p>– Shrii Shrii Anandamurti, founder of Ánanda Márga</p>
+<p>Quote taken from "Yoga and Bhakti", Subháśita Saḿgraha Part 18</p>

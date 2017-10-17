@@ -1,0 +1,44 @@
+{{extend 'layout.html'}}
+
+<h1>{{=user.username}}'s Battle Winner Vote History ({{="%.2f" % user.rider_score}})</h1>
+<table>
+	<tr>
+		<th>Time</th>
+		<th class="l">Level</th>
+		<th>Score</th>
+		<th>Votes</th>
+		<th>Log</th>
+		<th>Downloads</th>
+		<th>Tools</th>
+	</tr>
+	{{for row in battle_rows:}}
+	<tr>
+		<td>{{=row.started}}</td>
+		<td>{{=row.level_filename}}</td>
+		<td class="c">
+			{{if row.rec_score:}}
+				{{="%.2f" % row.rec_score}}
+			{{pass}}
+		</td>
+		<td class="c">
+			{{=row.rec_votes}}
+		</td>
+		<td class="c">
+			{{if row.rec_comments:}}
+				{{for comment in row.rec_comments.split('\n'):}}
+					{{=comment}}<br>
+				{{pass}}
+			{{pass}}
+		</td>
+		<td class="c">
+			<a href="http://elmaonline.net/downloads/lev/{{=row.eol_level_id}}" rel="external">Lev</a>
+			<a href="http://elmaonline.net/downloads/brec/{{=row.eol_battle_id}}" rel="external">Rec</a>
+		</td>
+		<td class="c">
+			<a href="http://www.elmaonline.net/battles/{{=row.eol_battle_id}}" rel="external" target="_blank">
+				<img class="icon" src="{{=URL('static','images/keyamoon/new-tab.png')}}" title="Eol Battle" alt="Eol Battle" style="m">
+			</a>
+		</td>
+	</tr>
+	{{pass}}
+</table>

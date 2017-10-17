@@ -1,0 +1,100 @@
+{{extend 'layout.html'}}
+
+<h1>Versus Matches: Ready for Battle</h1>
+{{if not battles:}}
+<p>
+	You have no requests right now. Someone needs to host a level and add you, and after that you can click Update.
+	<a onclick="window.location.href = ''" data-role="button" data-theme="b">Update</a>
+</p>
+{{else:}}
+<p>
+	<strong>Click a button to accept a battle. Once you click the button, the battle should start within less than a minute.</strong>
+</p>
+{{pass}}
+
+{{for battle in battles:}}
+	<button class="battle" data-id="{{=battle.id}}" data-url="{{=URL('ajax_battleh2h','player_ready')}}" data-theme="b" data-icon="check"
+	onclick="
+		var $button = $(this)
+		var url = $button.data('url')
+		// button crashes if pressed twice
+		if (typeof battle_id !== 'undefined') return
+		battle_id = $button.data('id')
+		$('.battle').not(this).fadeOut()
+		$.getJSON( url, { id:battle_id }, function( json )
+		{
+			if ( json.player1_status != 'ready' ) $button.html( $button.html()+'<br>Waiting for {{=battle.player1.username}}' )
+			else if ( json.player2_status != 'ready' ) $button.html( $button.html()+'<br>Waiting for {{=battle.player2.username}}' )
+			counter_interval = 1
+			informed_awaiting_host = false
+			wait_upload_interval = setInterval(
+				function()
+				{
+					$.getJSON( '{{=URL('ajax_battleh2h','check_started')}}', { id:battle_id }, function( json )
+					{
+						if ( !informed_awaiting_host && json.hasOwnProperty('player1_status') ) // waiting
+						{
+							if ( json.player1_status == 'ready' && json.player2_status == 'ready' )
+							{
+								$button.html( $button.html()+'<br><br>Now waiting for {{=battle.host.username}}<br>GET READY!' )
+								informed_awaiting_host = true
+							}
+						}
+						else if ( json.hasOwnProperty('seconds_left') ) // started
+						{
+							if (typeof seconds_left === 'undefined')
+							{
+								// init battle
+								battle_time_seconds = parseInt( json.seconds_left )
+								//battle_time_minutes = battle_time_seconds/60
+								seconds_left = battle_time_seconds + counter_interval
+								$slider = $('#{{=page_id}}-counter-slider')
+								$slider
+									.attr('max', battle_time_seconds )
+								//$button.fadeOut()
+								$('#{{=page_id}}-counter-slider-container').fadeIn()
+								$('.level_filename').text(json.level_filename)
+								$('.eol_level_id').first()
+									.text(json.level_title)
+									.attr('href', function(){ return $(this).attr('href')+json.level_filename } )
+							}
+							seconds_left = seconds_left - counter_interval
+							minutes_left = Math.floor( seconds_left/60 )
+							seconds_rest = seconds_left%60
+							console.log( seconds_left )
+							$slider
+								//.data('value','100*seconds_left/battle_time_seconds')
+								// set val after refresh, to keep digits
+								.val( seconds_left )
+								.slider('refresh') // move slider
+								.val( minutes_left + '.' + seconds_rest )
+							if ( seconds_left <= 0 )
+							{
+								$.get( '{{=URL('ajax_battleh2h','end_battle')}}', { id:battle_id }, function( battle_finished )
+								{
+									if (battle_finished == '1') window.location.href = '{{=URL('vs','standings')}}/{{=battle.player1.username}}/{{=battle.player2.username}}'
+								})
+							}
+						}
+					})
+				}
+			,counter_interval*1000)
+		})
+	">
+		{{=battle.player1.username}} &ndash; {{=battle.player2.username}}<br>by {{=battle.host.username}}
+	</button>
+{{pass}}
+<div id="{{=page_id}}-counter-slider-container" style="display:none;">
+	<label for="{{=page_id}}-counter-slider">Seconds left:</label>
+    <input type="range" id="{{=page_id}}-counter-slider" data-track-theme="b" data-theme="b" min="0" max="100" value="0" data-value="0" eonchange="$(this).val( $(this).data('value') ).slider('refresh')">
+	<br>
+	<br>
+	Either get level by pressing CTRL+F4 in EOL, and write this name: (experimental)<strong class="level_filename"></strong><br>
+	or download battle level: <a class="eol_level_id" href="http://elmaonline.net/downloads/lev/" rel="external"><span class="level_filename"></span></a>
+</div>
+
+<p>
+	<em>
+		Get ready for the battle of the century.<br>
+	</em>
+</p>

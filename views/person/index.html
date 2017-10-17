@@ -1,0 +1,37 @@
+{{extend 'layout.html'}}
+
+<h2>Eol Battle Quality Statistics</h2>
+<p><em>Automatically updated every hour. Made by ribot.</em></p>
+
+<p>
+	Usage (inside eol chat, where X is your given score):<br>
+	<strong>!lev X [optional comment]</strong><br>
+	Note: when a new battle has started, that level will be voted for.
+</p>
+
+<table>
+	<tr>
+		<th class="l">Nick</th>
+		<th>Designer Score</th>
+		<th>Total Votes</th>
+		<th>Tools</th>
+	</tr>
+	{{for row in designer_rows:}}
+	<tr>
+		<td>
+			{{=row.username}}
+			{{if row.team:}} [{{=row.team}}] {{pass}}
+		</td>
+		<td class="c">{{=row.designer_score}}</td>
+		<td class="c">{{=row.designer_votes}}</td>
+		<td>
+			<a href="{{=URL('eol_levstats','designer_history/%s'%row.username)}}">
+				<img class="icon" src="{{=URL('static','images/keyamoon/bars.png')}}" title="History" alt="History">
+			</a> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+			<a href="http://www.elmaonline.net/players/{{=row.username}}" rel="external" target="_blank">
+				<img class="icon" src="{{=URL('static','images/keyamoon/new-tab.png')}}" title="Eol Profile" alt="Eol Profile" style="m">
+			</a> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+		</td>
+	</tr>
+	{{pass}}
+</table>

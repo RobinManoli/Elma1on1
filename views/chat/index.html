@@ -1,0 +1,65 @@
+{{extend 'layout.html'}}
+
+<script>
+// fade out $this, and then fade in $element
+// can add optional fadeTime, and animate toptobottom, even toptoright
+$.fn.crossFade = function( $element ){
+	$this = $(this)
+	//console.log( 'crossFade header triggered:', $element, $(this) )
+
+	$this.fadeOut( function(){
+		$element.fadeIn()
+	})
+};
+
+
+$( function(){
+	$chat = $('#{{=page_id}}-chat')
+	chat_interval = setInterval(function(){
+		if (typeof chat_json == 'undefined' ) last_chat_id = 0
+		$.getJSON( '{{=URL('ajax_chat','get')}}', {id:last_chat_id}, function( json ){
+			chat_json = json
+			for (i in json)
+			{
+				var $div = $('<div />').hide()
+				$div.append( '<span class="date">' + json[i].created + ' </span>' )
+				$div.append( '<span class="username">&lt;' + json[i].username + '&gt; </span>' )
+				$div.append( '<span class="text">' + json[i].text + '</span>' )
+				$chat.append( $div )
+				$div.fadeIn()
+			}
+			clearInterval( chat_interval )
+		})
+	}, 5000)
+
+	$('#{{=page_id}}-chat-send input[type=button]').click(function(){
+		var $text = $(this).closest('.ui-field-contain').find('input[name=text]').first()
+		var text = $text.val()
+		$.post( '{{=URL('ajax_chat','send')}}', {text:text}, function( success ){
+			if ( success == '1' )
+			{
+				$text.val('')
+			}
+		}).fail(function(){ alert('error') })
+	})
+})
+</script>
+
+<h1>{{=request.controller.title()}}</h1>
+<div id="{{=page_id}}-chat">
+</div>
+
+<div class="ui-field-contain" id="{{=page_id}}-chat-send">
+	<input name="text">
+	<input type="button" value="oke">
+</div>
+
+<select>
+		<option value="">Start a battle with</option>
+	{{for user in users:}}
+		<option value="{{=user.username}}">{{=user.username}}</option>
+	{{pass}}
+</select>
+
+
+<em>Times in GMT</em>

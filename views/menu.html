@@ -1,0 +1,18 @@
+{{block left_sidebar}}
+            <nav>
+                <!--<ul class="nav nav-pills nav-stacked" style="text-align:right; border-right:1px solid #eee;">
+                    <li><a href="">Cucumbre</a></li>
+                    <li><a href="">Medit</a></li>
+                </ul>-->
+                <div class="tabbable tabs-left">
+                    <ul class="nav nav-tabs" style="text-align:right;">
+                        <li {{ if request.function == "index": response.write( "class='active'", escape=False ) }}><a href="/">Home</a></li>
+                        <li {{ if request.function == "yoga": response.write( "class='active'", escape=False ) }}><a href="/yoga">Yoga</a></li>
+                        <li {{ if request.function == "meditation": response.write( "class='active'", escape=False ) }}><a href="/meditation">Meditation</a></li>
+                        <li {{ if request.function == "service": response.write( "class='active'", escape=False ) }}><a href="/service">Service</a></li>
+                        <li {{ if request.function == "neohumanism": response.write( "class='active'", escape=False ) }}><a href="/neohumanism">Neohumanism</a></li>
+<!--                        <li><a href="/vegetarianism">Vegetarianism</a></li>-->
+                    </ul>
+                </div>
+            </nav>
+            {{end}}

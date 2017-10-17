@@ -1,0 +1,10 @@
+{{extend 'layout.html'}}
+<h1>Verify</h1>
+<p>This is the last step of the registration process.</p>
+<p>
+	Please type
+	<strong>!register {{=user.verification}}</strong>
+	in EOL chat to verify that you are {{=user.username}}.
+	Click verify AFTER you have seen it come up in EOL chat.
+</p>
+{{=form}}

@@ -1,0 +1,24 @@
+{{extend 'layout.html'}}
+
+<h1>Versus Matches</h1>
+<p>
+	Here you can play head to head matches against other riders.<br>
+	Someone needs to make a level, and be the host.<br>
+	Two other people battle head to head.
+</p>
+<p>
+	The host starts the battle by clicking <strong>Host Level</strong><br>
+	The battlers await instructions from the host.<br>
+</p>
+<p>
+	<strong>Battle length: 10 minutes</strong><br>
+</p>
+
+<a href="{{=URL('vs','ready')}}" data-role="button">Ready for Battle</a>
+<a href="{{=URL('vs','host')}}" data-role="button">Host Level</a>
+
+<p>
+	<em>
+		Get ready for the battle of the century.<br>
+	</em>
+</p>

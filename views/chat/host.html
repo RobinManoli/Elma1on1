@@ -1,0 +1,184 @@
+{{extend 'layout.html'}}
+
+<h1>Versus Matches: Host Level</h1>
+<h2>This is your mission now</h2>
+<label for="{{=page_id}}-progress-slider">Progress %</label>
+    <input type="range" id="{{=page_id}}-progress-slider" data-track-theme="b" data-theme="b" min="0" max="100" value="0" data-value="0" eonchange="$(this).val( $(this).data('value') ).slider('refresh')">
+
+<div id="{{=page_id}}-step1">
+	<ol>
+		<li>Have a decent level ready to play. Apples are not counted in this type of battle, so make sure your level is quite easy to finish.</li>
+		<li>Find two riders who can play right now. Tell them to come to <strong>elma.eartheart.se</strong> and register. Help them to register if they need.</li>
+		<li>Ask the two riders to login.</li>
+	</ol>
+	<button data-theme="b" onclick="
+			var $parent = $(this).closest('div');
+			$parent.fadeOut();
+			$parent.next('div').fadeIn();
+			$slider = $('#{{=page_id}}-progress-slider');
+			$slider.val('33').data('value','33').slider('refresh');
+		">Ready</button>
+</div><!-- /step1 -->
+
+<div id="{{=page_id}}-step2" style="display:none;">
+	<ol>
+		<li>Select the two riders you are hosting in this battle.</li>
+	</ol>
+	<fieldset data-role="controlgroup">
+		<select>
+			{{for user in users:}}
+				<option value="{{=user.username}}">{{=user.username}}</option>
+			{{pass}}
+		</select>
+		<select>
+			{{for user in users:}}
+				<option value="{{=user.username}}">{{=user.username}}</option>
+			{{pass}}
+		</select>
+	</fieldset>
+	<button data-url="{{=URL('ajax_battleh2h','register')}}" data-theme="b"
+		onclick="
+					var $button = $(this)
+					var $parent = $button.closest('div')
+					var $players = $parent.find('select')
+					var $player1 = $players.eq(0)
+					var $player2 = $players.eq(1)
+					player1 = $player1.val()
+					player2 = $player2.val()
+					if ( player1 == player2 ) return
+					var url = $button.data('url')
+					//console.log( player1, player2, url )
+					$.get( url, { player1:player1, player2:player2 },
+						function( id )
+						{
+							if ( !id ) return
+						    battle_id = id
+							$button
+								.fadeOut()
+								.next('button')
+									.text('Waiting for ' + player1 + ' and ' + player2 + ' to go to VS and click \'Ready for Battle\', and \'Accept\'')
+									.fadeIn()
+							player_ready_interval = setInterval(
+								function()
+								{
+									$.getJSON( '{{=URL('ajax_battleh2h','check_acceptance')}}', { id:battle_id },
+										function( json )
+										{
+											//console.log('awaiting player acceptance', json)
+											if ( json.player1_status == 'declined' )
+											{
+												clearInterval( player_ready_interval )
+												alert( player1 + ' did not accept the battle. Battle cancelled..' )
+											}
+											else if ( json.player2_status == 'declined' )
+											{
+												clearInterval( player_ready_interval )
+												alert( player2 + ' did not accept the battle. Battle cancelled..' )
+											}
+											else if ( json.player1_status == 'ready' && json.player2_status != 'ready' )
+												$button.next('button').text('Waiting for ' +  player2)
+											else if ( json.player1_status != 'ready' && json.player2_status == 'ready' )
+												$button.next('button').text('Waiting for ' +  player1)
+											else if ( json.player1_status == 'ready' && json.player2_status == 'ready' )
+											{
+												clearInterval( player_ready_interval )
+												$parent.parent('div')
+													.find('.level_filename').text(json.level_filename).end()
+													.find('.level_title').text(json.level_title).end()
+												$parent.fadeOut()
+												$slider.val('67').data('value','67').slider('refresh')
+												$parent.next('div')
+													.fadeIn()
+											}
+										}
+									)
+								},3000)
+						}
+					)
+				">Ready</button>
+	<button data-theme="b" style="display:none;">Riders need to go to VS and click 'Ready for Battle'</button>
+</div><!-- /step2 -->
+
+<div id="{{=page_id}}-step3" style="display:none;">
+	<h3>Great! Your battle has been accepted. Almost done now.</h3>
+	<ol>
+		<li>Connect to EOL. Press <strong>SHIFT+F3</strong> until you see the message: <strong>new levels are now not locked</strong>.</li>
+		<li>Now go to your level folder and rename your level to <strong class="level_filename">tzpzxfd</strong>.lev.</li>
+		<li>Now go into editor, and set the level title to <strong class="level_title">a vs b</strong>.</li>
+		<li>Save the level and exit the editor and go to externals and play your level <strong class="level_filename">tzpzxfd</strong>.lev. (It is not enough to play from editor.)</li>
+		<li>Click <strong>Ready</strong>. The rest will be taken care of by the universe ^^</li>
+	</ol>
+	<button data-url="{{=URL('ajax_battleh2h','check_upload')}}" data-theme="b"
+		onclick="
+					var $button = $(this)
+					var $parent = $button.closest('div')
+					var url = $button.data('url')
+					// console.log( url )
+					$.getJSON( url, { id:battle_id },
+						function( json )
+						{
+							//console.log('ajax done, success:', json)
+							if ( json.hasOwnProperty('level_title') )
+							{
+								$parent.parent('div')
+									.find('.level_title').text(json.level_title).end()
+								alert('There was a level duplicate. Please rename your level title to ' +json.level_title+ ', and after that go and play your level in externals (not in editor).')
+							}
+							else if ( json.hasOwnProperty('eol_level_id') && json.eol_level_id == '0' )
+							{
+								alert('Your level is not yet uploaded. Please make sure you have followed all steps correctly. Did you miss any step? Did you spell everything correctly? Is the EOL server lagging? If not, go back and play your level, press ESC, and play your level again. Then click Ready again.')
+							}
+							else if ( json.hasOwnProperty('eol_level_id') )
+							{
+								battle_time_seconds = json.seconds_left
+								//battle_time_minutes = Math.floor(battle_time_seconds/60)
+								seconds_left = json.seconds_left
+								counter_interval = 1 // update counter every this value second(s)
+								$parent.fadeOut()
+								// make slider into counter
+								$slider
+									.attr('max', battle_time_seconds )
+									.val( battle_time_seconds )
+									//.data('value','100')
+									.slider('refresh')
+								$('label[for=' +$slider.attr('id')+ ']').text('Seconds left:')
+								$parent.next('div')
+									.fadeIn()
+								battle_countdown_interval = setInterval(
+									function()
+									{
+										seconds_left = seconds_left - counter_interval
+										minutes_left = Math.floor( seconds_left/60 )
+										seconds_rest = seconds_left%60
+										if ( seconds_rest < 10 ) seconds_rest = '0' + seconds_rest
+										$slider
+											//.data('value','100*seconds_left/battle_time_seconds')
+											// set val after refresh, to keep digits
+											.val( seconds_left )
+											.slider('refresh') // move slider
+											.val( minutes_left + '.' + seconds_rest )
+										if ( seconds_left <= 0 )
+										{
+											$.get( '{{=URL('ajax_battleh2h','end_battle')}}', { id:battle_id }, function( battle_finished )
+											{
+												if (battle_finished == '1') window.location.href = '{{=URL('vs','standings')}}/' + player1 + '/' + player2
+											})
+										}
+									}
+								,counter_interval*1000)
+							}
+						}
+					)
+				">Ready</button>
+</div><!-- /step3 -->
+
+<div id="{{=page_id}}-step4" style="display:none;">
+	<h3 class="c">Battle started!</h3>
+	<h4 class="c level_title">a vs b</h4>
+	<p class="c">
+		The battle has now started! Please observe the battle and make sure everything works as it should.<br>
+		Press SHIFT+F5 inside EOL to see if there are any finished times.<br>
+		Enjoy!<br>
+		<strong class="level_filename">tzpzxfd</strong>.lev.
+	</p>
+</div><!-- /step4 -->

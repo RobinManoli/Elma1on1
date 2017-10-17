@@ -1,0 +1,45 @@
+{{block right_sidebar}}
+                <div class="tabbable tabs-right">
+                    <ul class="nav nav-tabs center">
+                        <li><h4>Spring 2013</h4></li>
+                        <li><h5>Yoga Classes</h5></li>
+<!--                        <li>
+				<a href="/contact_us">
+				Tuesdays<br />
+				<strong>18.00 - 19.30</strong><br />
+				Contact: Dada Shantimaya
+				</a>
+                        </li>-->
+                        <li>
+				<a href="/contact_us">
+				Weekdays<br />
+				<strong>08.30 - 09.30</strong><br />
+				Fridays and Saturdays,
+				<br />
+				<strong>18.30 - 19.30</strong><br />
+				Contact: Didi Ananda Dayashiila
+				</a>
+                        </li>
+                        <li>&nbsp;</li>
+                        <li><h5>Group Meditation</h5></li>
+                        <li>
+				<a href="/contact_us">
+				Wednesdays<br />
+				<strong>18.00 - 19.30</strong><br />
+				Contact: Dada Shantimaya
+				</a>
+                        </li>
+                        <li>
+                            {{
+                                import datetime
+                                now = datetime.datetime.now()
+                                nextDay = now + datetime.timedelta( days=6-now.weekday() )
+                                "response.write( nextDay.strftime('%B') + ' ' + str(nextDay.day) )"
+                            }}
+                            <a href="/meditation#dharmacakra">Sundays, Dharmacakra</a>
+                        </li>
+                        <li>&nbsp;</li>
+                        <li {{ if request.function == "contact_us": response.write( "class='active'", escape=False ) }}><a href="/contact_us">Contact Us</a></li>
+                    </ul>
+                </div>
+            {{end}}

@@ -1,0 +1,17 @@
+{{block right_sidebar}}
+                <div class="tabbable tabs-right">
+                    <ul class="nav nav-tabs">
+                        <li>&nbsp; Sunday
+                            {{
+                                import datetime
+                                now = datetime.datetime.now()
+                                nextSunday = now + datetime.timedelta( days=6-now.weekday() )
+                                response.write( nextSunday.strftime('%B') + ' ' + str(nextSunday.day) )
+                            }}
+                            <a href="/dharma-cakra">Dharma Cakra</a>
+                        </li>
+                        <li>&nbsp;</li>
+                        <li><a href="/contact-us">Contact Us</a></li>
+                    </ul>
+                </div>
+            {{end}}

@@ -1,0 +1,6 @@
+{{left_sidebar_enabled=True;right_sidebar_enabled=True; """('message' in globals())""" }}
+{{extend 'layout.html'}}
+
+<img id="main-page-image" class="center" src="{{=URL('static','images/samadhi.jpg')}}" alt="Samadhi - Absorption" style="border-radius:5px;" />
+<p class="center">“{{=T("Continue to the inner world... deeper... deeper... and deeper.")}}”</p>
+<p class="center">– Shrii Shrii Anandamurti, founder of Ánanda Márga</p>

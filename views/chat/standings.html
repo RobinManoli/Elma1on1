@@ -1,0 +1,15 @@
+{{extend 'layout.html'}}
+
+<h1>Versus Matches: Standings</h1>
+<p>
+	{{for battle in battles:}}
+	{{=battle.player1.username}} {{=battle.player1_status}} &ndash; {{=battle.player2.username}} {{=battle.player2_status}} (by {{=battle.host.username}})<br>
+	{{pass}}
+</p>
+
+<p>
+	<em>
+		Stats calculated from {{ =db(db.battle_h2h.id > 0).select( orderby=db.battle_h2h.ended, limitby=(0,1), cache=(cache.disk,60*60*24*365) ).first().started }}<br>
+		Total battles: ~{{ =db(db.battle_h2h.id > 0).count( cache=(cache.disk,60*60*24) ) }}<br>
+	</em>
+</p>

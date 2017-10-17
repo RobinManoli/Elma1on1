@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+	<title>
+		{{ =request.controller.replace('_',' ').replace('default','Elasto Mania').title() }}
+		- elma.eartheart.se
+		- Elasto Mania
+	</title>
+
+	<link rel="icon" type="image/png" href="{{=URL('static','images/icons/jedi-favicon.png')}}" />
+
+	<link rel="stylesheet" href="//code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.css">
+
+	<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+	<script src="//code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
+	<style>
+		.ui-title { white-space:normal !important; margin: 0 5% !important; }
+		img{ max-width:100%; max-height:100%; }
+		a{ text-decoration:none; }
+
+		img.c{ display:block; margin-left:auto; margin-right:auto; }
+
+		table th, table td { padding:10px; }
+		h1.l, h2.l, h3.l, h4.l, p.l, th.l, td.l { text-align:left; }
+		h1.c, h2.c, h3.c, h4.c, p.c, th.c, td.c { text-align:center; }
+		h1.r, h2.r, h3.r, h4.r, p.r, td.r, td.r { text-align:right; }
+		img.icon { height:1em; }
+
+		.error { color:red; }
+	</style>
+</head>
+
+<body>
+	<div data-role="page">
+		<div data-role="content">
+			<div data-role="header">
+				<div data-role="navbar">
+					<ul>
+						{{
+						# if a menu item has key ajax, the link will have attr data-ajax="false"
+						# if a menu item has key rel, the link will have attr rel="external"
+						menu = [
+							dict(
+								text="Elma",
+								url=URL('default','index'),
+								icon=URL('static','images/keyamoon/home2.png')
+								),
+							dict(
+								text="VS",
+								url=URL('vs','index'),
+								icon=URL('static','images/keyamoon/contract2.png'),
+								),
+							dict(
+								text="EOL Stats",
+								url=URL('eol_battles','index'),
+								icon=URL('static','images/keyamoon/bars.png')
+								),
+						]
+						if auth.user:
+							menu.append( dict(
+								text="Chat",
+								url=URL('chat','index'),
+								icon=URL('static','images/keyamoon/bubbles.png'),
+								))
+							menu.append( dict(
+								text="Logout",
+								url=URL('person','logout'),
+								icon=URL('static','images/keyamoon/exit.png')
+								))
+						else:
+							menu.append( dict(
+								text="Login",
+								url=URL('person','login'),
+								icon=URL('static','images/keyamoon/enter.png')
+								))
+						pass
+
+						submenu = {}
+						submenu['default'] = [
+						dict(
+							text="Quantum LevTool",
+							url=URL('static','quantumlev32.zip'),
+							ajax="",
+							icon=URL('static','images/keyamoon/download.png')
+							)
+						]
+
+						if auth.user:
+							submenu['vs'].append( dict(text="Standings", url=URL('vs','standings')) )
+							submenu['vs'].append( dict(text="Battle", url=URL('vs','ready')) )
+							submenu['vs'].append( dict(text="Host", url=URL('vs','host')) )
+						pass
+						submenu['eol_battles'] = [
+							dict( text="LevStats", url=URL('eol_battles','designer_score') ),
+							dict( text="RecStats", url=URL('eol_battles','rider_score') ),
+						]
+						
+						
+						for item in menu:
+						}}
+						<li>
+							<a
+								href="{{=item['url']}}"
+								{{if request.controller in item['url'] and request.function.replace("_history","").replace("index",request.controller) in item['url']:}}
+									class="ui-btn-active ui-state-persist"
+								{{pass}}
+								{{if 'ajax' in item.keys():}} data-ajax="false" {{pass}}
+								{{if 'rel' in item.keys():}} rel="external" {{pass}}
+							>
+								{{if 'icon' in item.keys():}} <img class="icon" src="{{=item['icon']}}"> {{pass}}
+								{{=item['text']}}
+							</a>
+						</li>
+						{{pass}}
+					</ul>
+				</div><!-- /navbar -->
+			</div><!-- /header -->
+			{{ if request.controller in submenu.keys(): }}
+			<div data-role="header">
+				<div data-role="navbar">
+					<ul>
+						{{ for item in submenu[request.controller]: }}
+							<li>
+								<a
+									href="{{=item['url']}}"
+									{{if request.controller in item['url'] and request.function.replace("_history","") in item['url']:}}
+										class="ui-btn-active ui-state-persist"
+									{{pass}}
+									{{if 'ajax' in item.keys():}} data-ajax="false" {{pass}}
+									{{if 'rel' in item.keys():}} rel="external" {{pass}}
+								>
+									{{if 'icon' in item.keys():}} <img class="icon" src="{{=item['icon']}}"> {{pass}}
+									{{=item['text']}}
+								</a>
+							</li>
+						{{pass}}
+						{{if len(submenu[request.controller]) == 1:}}
+							<li>&nbsp;</li>
+						{{pass}}
+					</ul>
+				</div><!-- /navbar -->
+			</div><!-- /header -->
+			{{pass}}
+
+			<!-- view -->
+			{{include}}
+			<!-- /view -->
+
+			<br>
+			<br>
+			<br>
+			<br>
+
+			<p class="c"><em>Made by ribot<br>&copy; &infin; Universal Consciousness</em></p>
+			<img class="c" src="{{=URL('static','images/jedi-100x100.png')}}" alt="All Your Base Are Belong To Us">
+			<p class="c"><strong>All Your Base Are Belong To Us</strong></p>
+			{{if response.flash:}}
+
+			<div data-role="footer" data-position="fixed">
+				<h3 class="ui-bar ui-bar-a">{{=response.flash}}</h3>
+			</div><!-- /footer -->
+			{{pass}}
+		</div><!-- /content -->
+	</div><!-- /page -->
+</body>
+</html>
+
